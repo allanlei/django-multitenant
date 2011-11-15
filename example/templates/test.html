@@ -1,0 +1,17 @@
+<html>
+    <body>
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" />
+        </form>
+        {{ places }}
+        
+        <p>Connections: {{ connections|length }}</p>
+        <ul>
+            {% for tenant, objs in tenants.items %}
+            <li><a href="?tenant={{ tenant }}">{{ tenant }}</a> {{ objs }}</li>
+            {% endfor %}
+        </ul>
+    </body>
+</html>
