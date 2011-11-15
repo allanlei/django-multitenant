@@ -1,16 +1,53 @@
 <html>
+    <head>
+        <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.7.0/jquery.min.js"></script>
+        
+        <script type="text/javascript">
+            $(window).load(function(){
+                $.each([
+                    {% for tenant in tenants %}
+                    "/?tenant={{ tenant }}",
+                    {% endfor %}
+                    {% for tenant in tenants %}
+                    "/?tenant={{ tenant }}",
+                    {% endfor %}
+                    {% for tenant in tenants %}
+                    "/?tenant={{ tenant }}",
+                    {% endfor %}
+                    {% for tenant in tenants %}
+                    "/?tenant={{ tenant }}",
+                    {% endfor %}
+                    {% for tenant in tenants %}
+                    "/?tenant={{ tenant }}",
+                    {% endfor %}
+                ], function(index, url){
+                    $.getJSON(url, function(data, status, xhr){
+                        var check = url.split("=")[1].split(".")[0];
+                        $.each(data, function(i, obj){
+                            if(obj.name.indexOf(check) != 0){
+                                console.log("Incorrect data returned.", url, obj, check);
+                                alert("ERROR DETECTED!");
+                                return false;
+                            }
+                        });
+                        //console.log("OK", url, data.length);
+                    });
+                });
+            });
+        </script>
+    </head>
     <body>
         <form method="POST">
             {% csrf_token %}
             {{ form.as_p }}
             <input type="submit" />
         </form>
-        {{ places }}
+        {{ places.count }}
         
         <p>Connections: {{ connections|length }}</p>
         <ul>
             {% for tenant, objs in tenants.items %}
-            <li><a href="?tenant={{ tenant }}">{{ tenant }}</a> {{ objs }}</li>
+            <li><a href="?tenant={{ tenant }}">{{ tenant }}</a> {{ objs.count }}</li>
             {% endfor %}
         </ul>
     </body>

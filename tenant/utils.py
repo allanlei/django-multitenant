@@ -1,5 +1,6 @@
 import urlparse
 
+
 def subdomain(sender, request=None, **kwargs):
     if request and 'HTTP_HOST' in request.META:
         host = request.META['HTTP_HOST'].split(':')[1]
