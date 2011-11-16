@@ -9,16 +9,6 @@ ADMINS = (
 
 MANAGERS = ADMINS
 
-def tenant_db(name):
-    return {name: {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'saas_%s' % name,
-        'USER': 'saas',
-        'PASSWORD': 'saas',
-        'HOST': '',
-        'PORT': '',
-    }}
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
@@ -29,9 +19,6 @@ DATABASES = {
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     },
 }
-
-for tenant in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k']:
-    DATABASES.update(tenant_db('%s.com' % tenant))
     
 # Local time zone for this installation. Choices can be found here:
 # http://en.wikipedia.org/wiki/List_of_tz_zones_by_name
@@ -134,8 +121,12 @@ INSTALLED_APPS = (
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
     
+    'south',
+    'django_extensions',
+    
     'example',
     'gunicorn',
+    'multischema',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -164,11 +155,50 @@ LOGGING = {
 
 
 
+#Dynamic adding/routing of tenants
+#MIDDLEWARE_CLASSES += (
+#    'tenant.middleware.TenantMiddleware',       #per request, connects read/write database signals for tenantrouter, needs to come before any middleware that has database access that needs to be routed
+#)
 
+#DATABASE_ROUTERS = ['tenant.routers.MultiDatabaseTenantRouter']
+    # When database access is requested without specifying which database, router sends out a call for tenant cadidates.  Doesnt do anything is nothing is connected to read/write signals, probably means TenantMiddleware is not connected
 
-DATABASE_ROUTERS = ['tenant.routers.MultiDatabaseTenantRouter']
-TENANT_ROUTING_PATTERN = 'tenant.utils.request_params'
+MULTITENANT_TENANTS = {
+    'a.com': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'saas_default',
+        'USER': 'saas',
+        'PASSWORD': 'saas',
+        'HOST': '',
+        'PORT': '',
+    },
+    'b.com': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'saas_default',
+        'USER': 'saas',
+        'PASSWORD': 'saas',
+        'HOST': '',
+        'PORT': '',
+    },
+    'c.com': {
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'saas_default',
+        'USER': 'saas',
+        'PASSWORD': 'saas',
+        'HOST': '',
+        'PORT': '',
+    },
+    'sqlite3.com': {
+        'ENGINE': 'django.db.backends.sqlite3',
+        'NAME': 'sqlite3.com.db',
+        'USER': '',
+        'PASSWORD': '',
+        'HOST': '',
+        'PORT': '',
+    },
+}
 
-MIDDLEWARE_CLASSES += (
-    'tenant.middleware.TenantMiddleware',
-)
+DATABASES.update(MULTITENANT_TENANTS)
+
+#for tenant in ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k']:
+#    MULTITENANT_TENANTS.update(tenant_db('%s.com' % tenant))
