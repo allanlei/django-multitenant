@@ -1,4 +1,4 @@
-#from django.db import models
+from django.db import models
 
 
 #class Tenant(models.Model):
@@ -10,3 +10,12 @@
 #    
 #    class Meta:
 #        pass
+
+#class TenantMixin(models.Model):
+#    class Meta:
+#        abstract = True
+#    
+##    def get_
+#        
+#class ProxyTenant():
+#    

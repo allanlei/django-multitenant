@@ -1,8 +1,4 @@
 from signals import request_for_read, request_for_write, request_for_syncdb
-from django.db import connections, transaction
-
-
-
 
 class BaseTenantRouter(object):
     def get_tenant(self, signal, model, **hints):
@@ -29,17 +25,15 @@ class MultiDatabaseTenantRouter(BaseTenantRouter):
     def db_for_write(self, model, **hints):
         return self.get_tenant(request_for_write, model, **hints)
 
+
+#from django.db import connections, transaction
 class MultiSchemaTenantRouter(BaseTenantRouter):
+    pass
+#    def db_for_read(self, model, **hints):
+#        schema = self.get_tenant(request_for_read, model, **hints)
+#        return None
+#        
 #    @transaction.commit_on_success
-    def db_for_read(self, model, **hints):
-        schema = self.get_tenant(request_for_read, model, **hints)
-#        print schema
-#        cursor = connections['default'].cursor()
-#        cursor.execute('SELECT * FROM example_place')
-#        transaction.set_dirty()
-        return None
-        
-    @transaction.commit_on_success
-    def db_for_write(self, model, **hints):
-        schema = self.get_tenant(request_for_write, model, **hints)
-        return None
+#    def db_for_write(self, model, **hints):
+#        schema = self.get_tenant(request_for_write, model, **hints)
+#        return None
