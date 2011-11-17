@@ -1,27 +1,20 @@
-from django.core.urlresolvers import get_callable
-from django.utils.functional import curry
+from django.core.urlresolvers import resolve
+from django.shortcuts import get_object_or_404
 
-import settings
-from signals import request_for_read, request_for_write, request_for_syncdb
-
-
-tenant_routing_pattern = get_callable(settings.MULTITENANT_ROUTING_HANDLER)
-get_tenant = get_callable(settings.MULTITENANT_TENANT_RETRIEVER)
+from tenant.models import Tenant
+from tenant.utils import connect_tenant_provider, disconnect_tenant_provider
 
 
 class TenantMiddleware(object):
     def process_request(self, request):
-        print 'Request %s' % request.get_full_path()
-        tenant = get_tenant(request)
-        if tenant:
+        request.tenant = None
+        name = resolve(request.path).kwargs.get('domain') or request.GET.get('tenant')
+        
+        if name:
+            tenant = get_object_or_404(Tenant.objects.using('default'), name=name)
             request.tenant = tenant
-            #Signal new_tenant
+            connect_tenant_provider(request, tenant.name)
             
-            request_for_read.connect(curry(tenant_routing_pattern, request=request), weak=False, dispatch_uid=request)
-            request_for_write.connect(curry(tenant_routing_pattern, request=request), weak=False, dispatch_uid=request)
-
     def process_response(self, request, response):
-        request_for_read.disconnect(weak=False, dispatch_uid=request)
-        request_for_write.disconnect(weak=False, dispatch_uid=request)
-        print '\tResponse %s' % request.get_full_path()
+        disconnect_tenant_provider(request)
         return response

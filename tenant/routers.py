@@ -1,39 +1,31 @@
-from signals import request_for_read, request_for_write, request_for_syncdb
+from tenant.utils import get_current_tenant
+
 
 class BaseTenantRouter(object):
-    def get_tenant(self, signal, model, **hints):
-        tenant = None
-        
-        responses = signal.send(sender=model, **hints)
-        
-        for resp in responses:
-            if resp[1]:
-                tenant = str(resp[1])
+    pass
+
+
+class TenantRouter(BaseTenantRouter):
+    def get_private_models(self):
+        if not hasattr(self, 'private_models'):
+            from django.db.models import get_model, get_app, get_models
+            from tenant import settings
+            
+            self.private_models = []
+#            self.private_models = [get_model(model.split('.', 1)) for model in settings.MULTITENANT_PRIVATE_MODELS]
+#        print self.private_models
+        return self.private_models
+
+    def db_for_read(self, model, **hints):
+        import threading
+        tenant = get_current_tenant(model=model, **hints)
         return tenant
         
-    def db_for_read(self, model, **hints):
-        raise NotImplementedError()
-    
     def db_for_write(self, model, **hints):
-        raise NotImplementedError()
+        tenant = get_current_tenant(model=model, **hints)
+        return tenant
 
-
-class MultiDatabaseTenantRouter(BaseTenantRouter):
-    def db_for_read(self, model, **hints):
-        return self.get_tenant(request_for_read, model, **hints)
-    
-    def db_for_write(self, model, **hints):
-        return self.get_tenant(request_for_write, model, **hints)
-
-
-#from django.db import connections, transaction
-class MultiSchemaTenantRouter(BaseTenantRouter):
-    pass
-#    def db_for_read(self, model, **hints):
-#        schema = self.get_tenant(request_for_read, model, **hints)
-#        return None
-#        
-#    @transaction.commit_on_success
-#    def db_for_write(self, model, **hints):
-#        schema = self.get_tenant(request_for_write, model, **hints)
-#        return None
+    def allow_syncdb(self, db, model):
+        if model in self.get_private_models():
+            return False
+        return None

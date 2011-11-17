@@ -1,16 +1,30 @@
 from django.conf import settings
 
 
+MULTITENANT_AUTHENTICATION_BACKENDS = tuple(getattr(settings, 'MULTITENANT_AUTHENTICATION_BACKENDS', (
+#    'tenant.backends.SubdomainBackend',
+#    'tenant.backends.RequestParametersBackend',
+#    'tenant.backends.DefaultBackend',
+#    'tenant.backends.TestBackend',
+    'tenant.backends.request.QueryParametersBackend',
+    'tenant.backends.DefaultBackend',
+)))
 
-MULTITENANT_ROUTING_HANDLER = getattr(settings, 'MULTITENANT_ROUTING_HANDLER', 'tenant.utils.request_params')
-#Used by TenantMiddleware to determine the tenant based off a request object. ie ?tenant=abc or abc.example.com or abc.tenants.example.com
-MULTITENANT_TENANT_RETRIEVER = getattr(settings, 'MULTITENANT_TENANT_RETRIEVER', 'tenant.utils.get_tenant')
+MULTITENANT_PUBLIC_MODELS = tuple(getattr(settings, 'MULTITENANT_PUBLIC_MODELS', (
+    'south',
+    'openid',
+)))
 
-MULTITENANT_DEFAULT_SETTINGS = {
-    'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-    'NAME': 'donations',                      # Or path to database file if using sqlite3.
-    'USER': 'donations',                      # Not used with sqlite3.
-    'PASSWORD': 'donations',                  # Not used with sqlite3.
-    'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
-    'PORT': '6432',                      # Set to empty string for default. Not used with sqlite3.
-},
+
+MULTITENANT_PRIVATE_MODELS = tuple(getattr(settings, 'MULTITENANT_PRIVATE_MODELS', (
+#    'donations'
+)))
+
+
+
+
+
+#MULTITENANT_TENANT_IDENTIFIER_HANDLER = getattr(settings, 'MULTITENANT_TENANT_IDENTIFIER_HANDLER', 'tenant.identifiers.query_tenant_identifier')
+#MULTITENANT_TENANT_REQUEST_READ = getattr(settings, 'MULTITENANT_TENANT_REQUEST_READ', 'tenant.signals.default_tenant_signal_response')
+#MULTITENANT_TENANT_REQUEST_WRITE = getattr(settings, 'MULTITENANT_TENANT_REQUEST_WRITE', 'tenant.signals.default_tenant_signal_response')
+#MULTITENANT_TENANT_REQUEST_READ = getattr(settings, 'MULTITENANT_TENANT_REQUEST_READ', 'ttenant.signals.default_tenant_signal_response')
