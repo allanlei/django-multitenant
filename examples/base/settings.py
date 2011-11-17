@@ -1,4 +1,4 @@
-# Django settings for multitenant1 project.
+# Django settings for base project.
 
 DEBUG = True
 TEMPLATE_DEBUG = DEBUG
@@ -11,10 +11,10 @@ MANAGERS = ADMINS
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
-        'NAME': 'multitenant',                      # Or path to database file if using sqlite3.
-        'USER': 'multitenant',                      # Not used with sqlite3.
-        'PASSWORD': 'multitenant',                  # Not used with sqlite3.
+        'ENGINE': 'django.db.backends.', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
+        'NAME': '',                      # Or path to database file if using sqlite3.
+        'USER': '',                      # Not used with sqlite3.
+        'PASSWORD': '',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
@@ -83,7 +83,7 @@ STATICFILES_FINDERS = (
 )
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = ')4go!ehq@agb$qcq_8)hjvpaq0irk&w!q(*@7#%d1f9f^w80bl'
+SECRET_KEY = '9mbycdririz)w1cq!1(f6l=1q!*2s4-o01)1cexe0rr-%sa&)2'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (
@@ -100,7 +100,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
 )
 
-ROOT_URLCONF = 'multitenant1.urls'
+ROOT_URLCONF = 'base.urls'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
@@ -119,11 +119,6 @@ INSTALLED_APPS = (
     # 'django.contrib.admin',
     # Uncomment the next line to enable admin documentation:
     # 'django.contrib.admindocs',
-    
-    'tenant',
-    'multischema',
-    
-    'multitenant1',
 )
 
 # A sample logging configuration. The only tangible logging
@@ -148,12 +143,3 @@ LOGGING = {
         },
     }
 }
-
-
-
-
-MIDDLEWARE_CLASSES += (
-    'tenant.middleware.TenantMiddleware',
-)
-
-DATABASE_ROUTERS = ['tenant.routers.MultiDatabaseTenantRouter']
