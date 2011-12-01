@@ -19,13 +19,12 @@ def get_current_tenant(sender=None, **hints):
             tenant = str(resp[1])
     return tenant
 
-def connect_tenant_provider(request, tenant):
+def connect_tenant_provider(dispatch_uid, tenant):
     signal_function = curry(lambda sender, tenant=None, **kwargs: tenant, tenant=tenant)
-    tenant_provider.connect(signal_function, weak=False, dispatch_uid=request, sender=threading.current_thread())
+    tenant_provider.connect(signal_function, weak=False, dispatch_uid=dispatch_uid, sender=threading.current_thread())
 
-def disconnect_tenant_provider(request):
-    tenant_provider.disconnect(weak=False, dispatch_uid=request)
-    request.tenant = None
+def disconnect_tenant_provider(dispatch_uid):
+    tenant_provider.disconnect(weak=False, dispatch_uid=dispatch_uid)
 
 def parse_connection_string(string):
     urlparse.uses_netloc.append('postgres')
@@ -47,3 +46,32 @@ def parse_connection_string(string):
     if not getattr(settings, 'ENGINE', None):
         raise Exception('DATABASE.ENGINE missing')
     return settings
+
+def get_public_models():
+    from django.db.models import get_model, get_app, get_models, get_apps
+    from tenant import settings
+    
+    models = []
+    for item in settings.MULTITENANT_PUBLIC_INCLUDE:
+        app, sep, model = item.partition('.')
+        if model:
+            models.append(get_model(app, model))
+        else:
+            models.extend(get_models(get_app(app)))
+    return models
+
+def get_private_models():
+    from django.db.models import get_model, get_app, get_models, get_apps
+    from tenant import settings
+    
+    excluded = []
+    for item in settings.MULTITENANT_PRIVATE_EXCLUDE:
+        app, sep, model = item.partition('.')
+        if model:
+            excluded.append(get_model(app, model))
+        else:
+            excluded.extend(get_models(get_app(app)))
+    all_models = []
+    for app in get_apps():
+        all_models.extend(get_models(app))
+    return list(set(all_models) - set(excluded))

@@ -24,9 +24,6 @@ class Tenant(models.Model):
     def ident(self):
         return self.name
 
-
-
-
 from django.db.models.signals import pre_save, post_save, post_init
 from signals import generate_public_name, syncdb, migrate
 

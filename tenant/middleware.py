@@ -17,4 +17,5 @@ class TenantMiddleware(object):
             
     def process_response(self, request, response):
         disconnect_tenant_provider(request)
+        request.tenant = None
         return response

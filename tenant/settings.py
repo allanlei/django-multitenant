@@ -10,14 +10,24 @@ MULTITENANT_AUTHENTICATION_BACKENDS = tuple(getattr(settings, 'MULTITENANT_AUTHE
     'tenant.backends.DefaultBackend',
 )))
 
-MULTITENANT_PUBLIC_MODELS = tuple(getattr(settings, 'MULTITENANT_PUBLIC_MODELS', (
-    'south',
-    'openid',
+MULTITENANT_TENANT_DATABASE = getattr(settings, 'MULTITENANT_TENANT_DATABASE', 'default')
+
+MULTITENANT_PUBLIC = tuple(getattr(settings, 'MULTITENANT_PUBLIC', (
+    'default',
+    MULTITENANT_TENANT_DATABASE,
 )))
 
+MULTITENANT_PUBLIC_INCLUDE = tuple(getattr(settings, 'MULTITENANT_PUBLIC_INCLUDE', (
+    'south',
+    'openid.Association',
+    'openid.Nonce',
+    'tenant',
+)))
 
-MULTITENANT_PRIVATE_MODELS = tuple(getattr(settings, 'MULTITENANT_PRIVATE_MODELS', (
-#    'donations'
+MULTITENANT_PRIVATE_EXCLUDE = tuple(getattr(settings, 'MULTITENANT_PRIVATE_EXCLUDE', (
+    'tenant',
+    'openid.Association',
+    'openid.Nonce',
 )))
 
 

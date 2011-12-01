@@ -1,5 +1,3 @@
-from django.http import Http404
-
 import collections
 
 
@@ -11,9 +9,11 @@ class DatabaseProvider(collections.MutableMapping):
     def __getitem__(self, key):
         if key != 'default' and key not in self.store and 'default' in self.store:
             from tenant.models import Tenant
-            from django.shortcuts import get_object_or_404
-            tenant = get_object_or_404(Tenant.objects.using('default'), name=key)
-            self[key] = tenant.settings
+            try:
+                tenant = Tenant.objects.using('default').get(name=key)
+                self[key] = tenant.settings
+            except Tenant.DoesNotExist, Tenant.MultipleObjectsReturned:
+                pass
         return self.store[self.__keytransform__(key)]
 
     def __setitem__(self, key, value):

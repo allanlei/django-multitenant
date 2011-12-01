@@ -1,9 +1,10 @@
+from django.conf import settings
+
 from south.management.commands import migrate
+from south import db
 
-from django.utils.functional import curry
+from tenant.utils import connect_tenant_provider, disconnect_tenant_provider
 
-from tenant.signals import request_for_read, request_for_write, request_for_syncdb
-from tenant.models import Tenant
 
 
 class Command(migrate.Command):
@@ -12,18 +13,13 @@ class Command(migrate.Command):
         
         if database == 'default':
             return super(Command, self).handle(*args, **options)
-        
-        
-        tenant = Tenant.objects.using('default').get(name=database)
-        
-        def tenant_based_route(sender, tenant=None, **kwargs):
-            return tenant
             
-        request_for_read.connect(curry(tenant_based_route, tenant=tenant), weak=False, dispatch_uid='migrate')
-        request_for_write.connect(curry(tenant_based_route, tenant=tenant), weak=False, dispatch_uid='migrate')
+        self.south_hack(database)
         
+        connect_tenant_provider('migrate', database)
         return super(Command, self).handle(*args, **options)
-        
-        request_for_read.disconnect(weak=False, dispatch_uid='migrate')
-        request_for_write.disconnect(weak=False, dispatch_uid='migrate')
-        
+
+    def south_hack(self, database):
+        module_name = "south.db.%s" % db.engine_modules.get(settings.DATABASES[database]['ENGINE'], None)
+        module = __import__(module_name, {}, {}, [''])
+        db.dbs[database] = module.DatabaseOperations(database)
