@@ -21,6 +21,6 @@ class QueryParametersBackend(BaseBackend):
 
         if tenant:
             try:
-                return Tenant.objects.using('default').get(name=tenant)
+                return Tenant.objects.get(name=tenant)
             except Tenant.DoesNotExist:
                 pass

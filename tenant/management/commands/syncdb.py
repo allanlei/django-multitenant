@@ -1,29 +1,23 @@
 from south.management.commands import syncdb
+from optparse import make_option
 
-from django.utils.functional import curry
-
-from tenant.signals import request_for_read, request_for_write, request_for_syncdb
-from tenant.models import Tenant
+from tenant.utils import connect_tenant_provider, disconnect_tenant_provider
+from tenant import settings
 
 
 class Command(syncdb.Command):
+    option_list = syncdb.Command.option_list + (
+        make_option('--dispatch_uid', action='store', dest='dispatch_uid',
+            default='syncdb'),
+    )
+    
     def handle(self, *args, **options):
-        database = options.get('database', 'default')
+        database = options.get('database', 'default')        
+        dispatch_uid = options.pop('dispatch_uid', 'syncdb')
         
-        if database == 'default':
-            return super(Command, self).handle(*args, **options)
-        
-        
-        tenant = Tenant.objects.using('default').get(name=database)
-        
-        def tenant_based_route(sender, tenant=None, **kwargs):
-            return tenant
+        if database not in settings.MULTITENANT_PUBLIC_DATABASES:
+            connect_tenant_provider(dispatch_uid, database)
             
-        request_for_read.connect(curry(tenant_based_route, tenant=tenant), weak=False, dispatch_uid='syncdb')
-        request_for_write.connect(curry(tenant_based_route, tenant=tenant), weak=False, dispatch_uid='syncdb')
-        
-        return super(Command, self).handle(*args, **options)
-        
-        request_for_read.disconnect(weak=False, dispatch_uid='syncdb')
-        request_for_write.disconnect(weak=False, dispatch_uid='syncdb')
-        
+        response = super(Command, self).handle(*args, **options)
+        disconnect_tenant_provider(dispatch_uid)
+        return response

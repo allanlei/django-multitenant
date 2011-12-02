@@ -4,16 +4,18 @@ import collections
 class DatabaseProvider(collections.MutableMapping):
     def __init__(self, *args, **kwargs):
         self.store = dict()
-        self.update(dict(*args, **kwargs)) # use the free update to set keys
+        self.update(dict(*args, **kwargs))
 
     def __getitem__(self, key):
-        if key != 'default' and key not in self.store and 'default' in self.store:
-            from tenant.models import Tenant
-            try:
-                tenant = Tenant.objects.using('default').get(name=key)
-                self[key] = tenant.settings
-            except Tenant.DoesNotExist, Tenant.MultipleObjectsReturned:
-                pass
+        from tenant import settings
+        if key not in self.store and settings.MULTITENANT_TENANT_DATABASE in self.store:
+            if key not in settings.MULTITENANT_PUBLIC_DATABASES:
+                from tenant.models import Tenant
+                try:
+                    tenant = Tenant.objects.get(name=key)
+                    self[key] = tenant.settings
+                except Tenant.DoesNotExist, Tenant.MultipleObjectsReturned:
+                    pass    #Will Raise KeyError
         return self.store[self.__keytransform__(key)]
 
     def __setitem__(self, key, value):
