@@ -15,7 +15,7 @@ class DatabaseProvider(collections.MutableMapping):
                     tenant = Tenant.objects.get(name=key)
                     self[key] = tenant.settings
                 except Tenant.DoesNotExist, Tenant.MultipleObjectsReturned:
-                    pass    #Will Raise KeyError
+                    pass
         return self.store[self.__keytransform__(key)]
 
     def __setitem__(self, key, value):

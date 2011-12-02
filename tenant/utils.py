@@ -14,7 +14,6 @@ def get_current_tenant(sender=None, **hints):
 
     tenant = None
     responses = tenant_provider.send(sender=sender, **hints)
-#    print tenant_provider.receivers, responses
     
     for resp in responses:
         if resp[1]:

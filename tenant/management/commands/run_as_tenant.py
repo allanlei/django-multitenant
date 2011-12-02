@@ -4,8 +4,6 @@ from django.core.management import get_commands, call_command, load_command_clas
 from optparse import make_option, OptionParser
 import sys
 
-from tenant import authenticate
-
 
 class Command(BaseCommand):
     option_list = (
@@ -34,8 +32,7 @@ class Command(BaseCommand):
         return parser
 
     def handle(self, *args, **kwargs):
-#        print args, kwargs
         tenant = kwargs.pop('tenant', None)
         if tenant:
-            print authenticate(name=tenant)
+            pass
         call_command(self.subcommand, *args, **kwargs)

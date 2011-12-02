@@ -1,15 +1,6 @@
 from django.dispatch import Signal
 from django.core.management import call_command
 
-
-request_for_read = Signal(providing_args=[])
-request_for_write = Signal(providing_args=[])
-request_for_syncdb = Signal(providing_args=[])
-
-tenant_authenticated = Signal(providing_args=['tenant'])
-tenant_connected = Signal(providing_args=['tenant'])
-tenant_disconnected = Signal(providing_args=['tenant'])
-
 tenant_provider = Signal(providing_args=[])
 
 

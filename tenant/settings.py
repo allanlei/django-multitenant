@@ -16,36 +16,3 @@ MULTITENANT_PUBLIC_DATABASES = tuple(getattr(settings, 'MULTITENANT_PUBLIC', (
 )))
 
 MULTITENANT_PUBLIC = MULTITENANT_PUBLIC_DATABASES
-
-
-
-
-
-
-
-
-
-
-#MULTITENANT_PUBLIC_INCLUDE = tuple(getattr(settings, 'MULTITENANT_PUBLIC_INCLUDE', (
-#    'tenant',
-#)))
-
-#MULTITENANT_PRIVATE_EXCLUDE = tuple(getattr(settings, 'MULTITENANT_PRIVATE_EXCLUDE', (
-#    'tenant',
-#)))
-
-
-
-#MULTITENANT_PUBLIC_APPS = tuple(getattr(settings, 'MULTITENANT_PUBLIC_APPS', (
-#    'tenant',
-#)))
-
-#MULTITENANT_PRIVATE_APPS = tuple(getattr(settings, 'MULTITENANT_PRIVATE_APPS', set(settings.INSTALLED_APPS) - set(['tenant'])))
-
-
-
-
-
-
-#Change to sync all tables for public/private, but deny read/write based on public/private
-#Syncdb tough to change
