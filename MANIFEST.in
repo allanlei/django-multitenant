@@ -1,5 +1,4 @@
 include README
 include LICENSE
 include MANIFEST
-recursive-include example *.py *.html
-graft multitenant
+graft tenant

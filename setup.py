@@ -18,7 +18,7 @@ setup(
     license = 'New BSD',
     keywords = 'multitenant multidb multischema django',
     url = 'https://github.com/allanlei/django-multitenant',
-    packages=find_packages_in('multitenant'),
+    packages=find_packages_in('tenant'),
     long_description=read('README.md'),
     classifiers=[
         'Development Status :: 3 - Alpha',
