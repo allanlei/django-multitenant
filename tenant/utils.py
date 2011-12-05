@@ -7,28 +7,40 @@ import os
 import sys
 import urlparse
 
+import logging
+logger = logging.getLogger(__name__)
+
 
 def get_current_tenant(sender=None, **hints):
     if sender is None:
         sender = threading.current_thread()
-
-    tenant = None
-    responses = tenant_provider.send(sender=sender, **hints)
     
+    tenant = None
+    
+    responses = tenant_provider.send(sender=sender, **hints)
     for resp in responses:
         if resp[1]:
             tenant = str(resp[1])
             break
     return tenant
 
-def connect_tenant_provider(dispatch_uid, tenant):
-    signal_function = curry(lambda sender, tenant=None, **kwargs: tenant, tenant=tenant)
-    tenant_provider.connect(signal_function, weak=False, dispatch_uid=dispatch_uid, sender=threading.current_thread())
+def get_tenant(sender, tenant=None, **kwargs):
+    return tenant
+    
+def connect_tenant_provider(dispatch_uid, tenant, sender=None):
+    if sender is None:
+        sender = threading.current_thread()
+    signal_function = curry(get_tenant, tenant=tenant)
+    tenant_provider.connect(signal_function, weak=False, dispatch_uid=dispatch_uid, sender=sender)
+
 
 def disconnect_tenant_provider(dispatch_uid, sender=None):
     if sender is None:
         sender = threading.current_thread()
     tenant_provider.disconnect(weak=False, dispatch_uid=dispatch_uid, sender=sender)
+
+
+
 
 def parse_connection_string(string):
     urlparse.uses_netloc.append('postgres')
