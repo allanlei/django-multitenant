@@ -32,6 +32,7 @@ def connect_tenant_provider(dispatch_uid, tenant, sender=None):
         sender = threading.current_thread()
     signal_function = curry(get_tenant, tenant=tenant)
     tenant_provider.connect(signal_function, weak=False, dispatch_uid=dispatch_uid, sender=sender)
+    return dispatch_uid
 
 
 def disconnect_tenant_provider(dispatch_uid, sender=None):

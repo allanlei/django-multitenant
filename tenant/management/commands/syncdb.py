@@ -12,7 +12,7 @@ class Command(syncdb.Command):
     )
     
     def handle(self, *args, **options):
-        database = options.get('database', 'default')        
+        database = options.get('database', 'default')
         dispatch_uid = options.pop('dispatch_uid', 'syncdb')
         
         if database not in settings.MULTITENANT_PUBLIC_DATABASES:

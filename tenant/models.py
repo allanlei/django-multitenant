@@ -11,6 +11,10 @@ class Tenant(models.Model):
     connection = models.TextField(blank=True)
 
     @property
+    def ident(self):
+        return self.name
+        
+    @property
     def settings(self):
         try:
             return parse_connection_string(self.connection)
@@ -21,9 +25,6 @@ class Tenant(models.Model):
     def __unicode__(self):
         return self.public_name
     
-    @property
-    def ident(self):
-        return self.name
         
 
 from django.db.models.signals import pre_save, post_save, post_init, post_delete
