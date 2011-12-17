@@ -7,15 +7,28 @@ from tenant.utils import connect_tenant_provider, disconnect_tenant_provider
 
 
 class TenantMiddleware(object):
+    def identify_tenant(self, request):
+        name = None
+        
+        if name is None:
+            try:
+                name = resolve(request.path).kwargs.get('tenant', None)
+            except:
+                pass
+        if name is None:
+            name = request.GET.get('tenant', None)
+        return name
+        
     def process_request(self, request):
         request.tenant = None
-        name = resolve(request.path).kwargs.get('tenant') or request.GET.get('tenant')
         
+        name = self.identify_tenant(request)
         if name:
             tenant = get_object_or_404(Tenant, name=name)
             request.tenant = tenant
             connect_tenant_provider(request, tenant.name)
-            
+        return None
+        
     def process_response(self, request, response):
         disconnect_tenant_provider(request)
         request.tenant = None
