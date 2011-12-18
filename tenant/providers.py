@@ -4,8 +4,6 @@ import logging
 logger = logging.getLogger(__name__)
 
 
-#NOT THREAD SAFE!!!!!!!!!!!!!!!!!!!!!!!!!!
-
 class DatabaseProvider(collections.MutableMapping):
     def __init__(self, *args, **kwargs):
         self.store = dict()
