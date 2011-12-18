@@ -1,3 +1,9 @@
+* This readme are just notes for now *
+* PGBouncer *
+Ran into trouble when using PGBouncer on transaction mode with all tenants having the same db/username/host/port and Tenant TransactionMiddleware.
+PGBouncer will think its the same things and not create a new connection from the pool and thus not setting schema on connect.
+
+
 Running example
 
 python manage.py syncdb
