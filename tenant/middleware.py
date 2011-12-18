@@ -26,14 +26,13 @@ class TenantMiddleware(object):
         if name:
             tenant = get_object_or_404(Tenant, name=name)
             request.tenant = tenant
-            connect_tenant_provider(request, tenant.name)
+            connect_tenant_provider(request, tenant.ident)
         return None
         
     def process_response(self, request, response):
         disconnect_tenant_provider(request)
         request.tenant = None
         return response
-
 
 
 class TransactionMiddleware(object):
