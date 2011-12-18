@@ -3,8 +3,6 @@ from django.utils.functional import curry
 from tenant.signals import tenant_provider
 
 import threading
-import os
-import sys
 import urlparse
 
 import logging
