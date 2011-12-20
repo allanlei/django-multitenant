@@ -7,6 +7,8 @@ from tenant import settings as tenant_settings
 
 
 class Tenant(models.Model):
+    created = models.DateTimeField(auto_now_add=True)
+    is_active = models.BooleanField(default=True)
     name = models.CharField(max_length=256, unique=True, db_index=True)
     public_name = models.CharField(max_length=256)
 
