@@ -47,7 +47,7 @@ class DatabaseProvider(collections.MutableMapping):
         
         if kt in self.store:
             logger.debug('Closing {0}...'.format(kt))
-            from django.db import connections
+            from django.db import connections, transaction
             connections[kt].close()
             
             from tenant import settings

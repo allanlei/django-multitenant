@@ -62,22 +62,51 @@ def parse_connection_string(string):
         raise Exception('DATABASE.ENGINE missing')
     return settings
 
-def get_public_models():
-    from django.db.models import get_models, get_app
+def get_public_apps():
+    from django.db.models import get_models, get_app, get_apps
     from tenant import settings
+#    from django.db.models.loading import cache as appcache
     
-    models = []
-    for app in settings.MULTITENANT_PUBLIC_APPS:
-        app = app.split('.')[-1]
-        models.extend(get_models(get_app(app)))
-    return models
+    if settings.MULTITENANT_PUBLIC_APPS is not None:
+        include = [app.split('.')[-1] for app in settings.MULTITENANT_PUBLIC_APPS]
+#        for app in settings.MULTITENANT_PUBLIC_APPS:
+#            app = app.split('.')[-1]
+#            include.extend(get_models(get_app(app)))
+    else:
+        include = [app_mod.__name__.split('.')[-2] for app_mod in get_apps()]
+    
+    if settings.MULTITENANT_PUBLIC_APPS_EXCLUDE is not None:
+        exclude = [app.split('.')[-1] for app in settings.MULTITENANT_PUBLIC_APPS_EXCLUDE]
+        
+#        exclude = []
+#        for app in settings.MULTITENANT_PUBLIC_APPS_EXCLUDE:
+#            app = app.split('.')[-1]
+#            exclude.extend(get_models(get_app(app)))
+    else:
+        exclude = []
+    return list(set(include) - set(exclude))
 
-def get_private_models():
-    from django.db.models import get_models, get_app
+def get_private_apps():
+    from django.db.models import get_models, get_app, get_apps
     from tenant import settings
     
-    models = []
-    for app in settings.MULTITENANT_PRIVATE_APPS:
-        app = app.split('.')[-1]
-        models.extend(get_models(get_app(app)))
-    return models
+    if settings.MULTITENANT_PRIVATE_APPS is not None:
+        include = [app.split('.')[-1] for app in settings.MULTITENANT_PRIVATE_APPS]
+        
+#        include = []
+#        for app in settings.MULTITENANT_PRIVATE_APPS:
+#            app = app.split('.')[-1]
+#            include.extend(get_models(get_app(app)))
+    else:
+        include = [app_mod.__name__.split('.')[-2] for app_mod in get_apps()]
+    
+    if settings.MULTITENANT_PRIVATE_APPS_EXCLUDE is not None:
+        exclude = [app.split('.')[-1] for app in settings.MULTITENANT_PRIVATE_APPS_EXCLUDE]
+        
+#        exclude = []
+#        for app in settings.MULTITENANT_PRIVATE_APPS_EXCLUDE:
+#            app = app.split('.')[-1]
+#            exclude.extend(get_models(get_app(app)))
+    else:
+        exclude = []
+    return list(set(include) - set(exclude))

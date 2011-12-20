@@ -1,8 +1,14 @@
+from django.db import transaction, connections
+
 from south.management.commands import syncdb
 from optparse import make_option
 
 from tenant.utils import connect_tenant_provider, disconnect_tenant_provider
 from tenant import settings
+
+import sys
+import logging
+logger = logging.getLogger(__name__)
 
 
 class Command(syncdb.Command):
@@ -12,12 +18,27 @@ class Command(syncdb.Command):
     )
     
     def handle(self, *args, **options):
-        database = options.get('database', 'default')
-        dispatch_uid = options.pop('dispatch_uid', 'syncdb')
+        dispatch_uid = options.pop('dispatch_uid')
+        databases = []
         
-        if database not in settings.MULTITENANT_PUBLIC_DATABASES:
-            connect_tenant_provider(dispatch_uid, database)
+        database = options.pop('database')
+        if database == '-':
+            databases.extend(map(lambda i: i.strip(), sys.stdin.readlines()))
+        else:
+            databases.append(database)
+        
+        for database in databases:
+            if database not in settings.MULTITENANT_PUBLIC_DATABASES:
+                connect_tenant_provider(dispatch_uid, database)
             
-        response = super(Command, self).handle(*args, **options)
-        disconnect_tenant_provider(dispatch_uid)
+            opts = options.copy()
+            opts.update({
+                'database': database,
+            })
+            
+            logging.info('Syncdb {database}...'.format(database=database))
+            response = super(Command, self).handle(*args, **opts)
+            
+            connections[database].close()
+            disconnect_tenant_provider(dispatch_uid)
         return response
