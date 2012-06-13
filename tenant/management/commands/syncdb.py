@@ -46,4 +46,4 @@ class Command(syncdb.Command):
             response = super(Command, self).handle(*args, **opts)
             connections[database].close()
             disconnect_tenant_provider(dispatch_uid)
-        return response
+#        return response
