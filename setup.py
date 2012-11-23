@@ -21,7 +21,7 @@ setup(
     packages=find_packages_in('tenant'),
     long_description=read('README.md'),
     install_requires=[
-        'Django<1.4',
+        'Django>=1.4',
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',
