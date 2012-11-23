@@ -8,6 +8,7 @@ from tenant import settings
 from tenant.models import Tenant
 
 import sys
+import random
 import logging
 logger = logging.getLogger(__name__)
 
@@ -33,6 +34,7 @@ class Command(syncdb.Command):
         else:
             databases.append(database)
         
+        random.shuffle(databases)
         for database in databases:
             if database not in settings.MULTITENANT_PUBLIC_DATABASES:
                 connect_tenant_provider(dispatch_uid, database)

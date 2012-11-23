@@ -12,6 +12,7 @@ from tenant import settings as tenant_settings
 from tenant.models import Tenant
 
 import sys
+import random
 import logging
 logger = logging.getLogger(__name__)
 
@@ -36,7 +37,8 @@ class Command(migrate.Command):
             databases.extend([tenant['name'] for tenant in Tenant.objects.values('name')])
         else:
             databases.append(database)
-            
+        
+        random.shuffle(databases)
         for database in databases:
             if database not in tenant_settings.MULTITENANT_PUBLIC_DATABASES:
                 db.dbs[database] = self.get_south_wrapper(database, settings.DATABASES[database]['ENGINE'])
