@@ -20,6 +20,9 @@ setup(
     url = 'https://github.com/allanlei/django-multitenant',
     packages=find_packages_in('tenant'),
     long_description=read('README.md'),
+    install_requires=[
+        'Django<1.4',
+    ],
     classifiers=[
         'Development Status :: 3 - Alpha',
         'License :: OSI Approved :: BSD License',
