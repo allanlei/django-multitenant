@@ -53,7 +53,7 @@ class DatabaseProvider(collections.MutableMapping):
             from tenant import settings
             if settings.MULTITENANT_DESTROY_CONNECTION_ON_REMOVE:
                 logger.debug('Deleting connection {0}...'.format(kt))
-                delattr(connections._connections[kt])
+                delattr(connections._connections, kt)
         del self.store[kt]
 
     def __iter__(self):
