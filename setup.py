@@ -11,7 +11,7 @@ def find_packages_in(where, **kwargs):
 
 setup(
     name = 'django-multitenant',
-    version = '0.2.7',
+    version = '0.2.8',
     author = 'Allan Lei',
     author_email = 'allanlei@helveticode.com',
     description = ('Multi-tenant addons for Django'),
@@ -21,7 +21,7 @@ setup(
     packages=find_packages_in('tenant'),
     long_description=read('README.md'),
     install_requires=[
-        'Django<1.4',
+        'Django>=1.4',
     ],
     classifiers=[
         'Development Status :: 3 - Alpha',
