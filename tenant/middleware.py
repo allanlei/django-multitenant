@@ -43,19 +43,27 @@ class TransactionMiddleware(object):
         
     def process_request(self, request):
         """Enters transaction management"""
-        transaction.enter_transaction_management(using=self.get_tenant(request))
-        transaction.managed(True, using=self.get_tenant(request))
+        db = self.get_tenant(request)
+        if db:
+            transaction.enter_transaction_management(using=db)
+            transaction.managed(True, using=db)
 
     def process_exception(self, request, exception):
         """Rolls back the database and leaves transaction management"""
-        if transaction.is_dirty(using=self.get_tenant(request)):
-            transaction.rollback(using=self.get_tenant(request))
-        transaction.leave_transaction_management(using=self.get_tenant(request))
+        db = self.get_tenant(request)
+        if db:
+            if transaction.is_dirty(using=db):
+                transaction.rollback(using=db)
+
+            if transaction.is_managed(using=db):
+                transaction.leave_transaction_management(using=db)
 
     def process_response(self, request, response):
         """Commits and leaves transaction management."""
-        if transaction.is_managed(using=self.get_tenant(request)):
-            if transaction.is_dirty(using=self.get_tenant(request)):
-                transaction.commit(using=self.get_tenant(request))
-            transaction.leave_transaction_management(using=self.get_tenant(request))
+        db = self.get_tenant(request)
+        if db:
+            if transaction.is_managed(using=db):
+                if transaction.is_dirty(using=db):
+                    transaction.commit(using=db)
+                transaction.leave_transaction_management(using=db)
         return response
